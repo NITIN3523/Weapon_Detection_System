@@ -55,6 +55,3 @@ Download it and put it in Model ==> Weights folder
 
 **Image View**
 ![Large_ViewImage](https://github.com/user-attachments/assets/39e9f9ec-f966-444c-922f-3a5a833b4f12)
-
-
-
