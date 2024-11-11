@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Alert Form</title>
+    <link
+      href="{{url_for('static',filename='/output.css')}}"
+      rel="stylesheet"
+    />
+    <style>
+      td {
+        padding-top: 10px; /* Adds vertical spacing between rows */
+      }
+      .highlight {
+        animation: highlightEffect 3s;
+      }
+
+      @keyframes highlightEffect {
+        from {
+          background-color: #ffff99; /* Light yellow */
+        }
+        to {
+          background-color: white;
+        }
+      }
+    </style>
+  </head>
+
+  <body style="background-image: url('static/bg.jpg')">
+    <div class="w-full">
+      <div
+        class="flex justify-between mx-auto max-w-screen-xl p-4 w-full text-white"
+      >
+        <a>
+          <span class="self-center text-2xl font-semibold whitespace-nowrap"
+            >Weapon Detection System</span
+          >
+        </a>
+        <div class="flex items-center space-x-6 rtl:space-x-reverse">
+          <a href="" class="text-xl text-white">Hello {{username}}</a>
+          <a
+            href="{{ url_for('logout') }}"
+            class="text-xl text-blue-600 dark:text-blue-500 hover:underline"
+            >Logout</a
+          >
+        </div>
+      </div>
+    </div>
+    <br /><br />
+    <div class="px-4">
+      <div
+        class="alert_search_bar flex px-8 py-3 justify-between items-center bg-white rounded-md"
+      >
+        <input
+          class="w-[20%] bg-transparent placeholder:text-slate-400 text-slate-700 text-sm border border-slate-200 rounded-md px-3 py-2 transition duration-300 ease focus:outline-none focus:border-slate-400 hover:border-slate-300 shadow-sm focus:shadow"
+          type="text"
+          id="location"
+          name="location"
+          placeholder="Location"
+          required
+        />
+        <input
+          class="w-[20%] bg-transparent placeholder:text-slate-400 text-slate-700 text-sm border border-slate-200 rounded-md px-3 py-2 transition duration-300 ease focus:outline-none focus:border-slate-400 hover:border-slate-300 shadow-sm focus:shadow"
+          type="text"
+          id="sent_to"
+          name="sent_to"
+          placeholder="Alert was sent to"
+          required
+        />
+        <input
+          class="w-[20%] bg-transparent placeholder:text-slate-400 text-slate-700 text-sm border border-slate-200 rounded-md px-3 py-2 transition duration-300 ease focus:outline-none focus:border-slate-400 hover:border-slate-300 shadow-sm focus:shadow"
+          type="text"
+          id="sdate"
+          name="sdate"
+          placeholder="Start Date"
+          required
+        />
+        <input
+          class="w-[20%] bg-transparent placeholder:text-slate-400 text-slate-700 text-sm border border-slate-200 rounded-md px-3 py-2 transition duration-300 ease focus:outline-none focus:border-slate-400 hover:border-slate-300 shadow-sm focus:shadow"
+          type="text"
+          id="edate"
+          name="edate"
+          placeholder="End Date"
+          required
+        />
+        <input
+          type="submit"
+          onclick="filterTable()"
+          class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 focus:outline-none"
+          value="Search"
+        />
+      </div>
+      <br /><br />
+      <div class="bg-white rounded-md p-4">
+        <table class="table-auto w-full text-center" id="myTable">
+          <thead>
+            <tr class="text-xl bg-slate-300">
+              <th>DETECTION</th>
+              <th>LOCATION</th>
+              <th>ALERT SENT TO</th>
+              <th>DATE/TIME</th>
+              <th>VIEW</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for item in items %}
+            <tr>
+              <td>
+                {% set image_dir = listdir[loop.index0]%}
+                <img
+                  src="/static/Images/{{email}}/{{image_dir}}"
+                  alt="Weapon Images"
+                  width="100"
+                  height="100"
+                  class="rounded-lg"
+                />
+              </td>
+              <td>{{item.camera_name}}</td>
+              <td>{{email}}</td>
+              <td>{{item.datetime}}</td>
+              <td>
+                <input
+                  type="submit"
+                  onclick="showModal('/static/Images/{{email}}/{{image_dir}}', '{{item.camera_name}}', '{{email}}', '{{item.datetime}}')"
+                  class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 focus:outline-none"
+                  value="View"
+                />
+              </td>
+            </tr>
+            {%endfor%}
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <!-- Modal -->
+    <div
+      id="imageModal"
+      class="hidden z-12 rounded-xl shadow-2xl shadow-amber-300 fixed bottom-[20%] left-[20%] top-[20%] w-[60%] h-[70%] overflow-auto"
+    >
+      <div class="w-full h-full text-center bg-white">
+        <div class="h-[92%]">
+          <span
+            class="absolute right-[0.25rem] top-0 text-3xl font-bold cursor-pointer text-white hover:text-slate-200 hover:cursor-pointer"
+            onclick="closeModal()"
+            >&times;</span
+          >
+          <img
+            id="modalImage"
+            src=""
+            alt="Large Weapon Image"
+            class="max-w-full h-[95%] w-full static"
+          />
+        </div>
+        <div class="flex justify-between px-4 bg-white">
+          <p><strong>Location:</strong> <span id="modalLocation"></span></p>
+          <p><strong>Alert Sent To:</strong> <span id="modalSentTo"></span></p>
+          <p><strong>Date/Time:</strong> <span id="modalDateTime"></span></p>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      function showModal(imageSrc, location, sentTo, dateTime) {
+        document.getElementById("modalImage").src = imageSrc;
+        document.getElementById("modalLocation").textContent = location;
+        document.getElementById("modalSentTo").textContent = sentTo;
+        document.getElementById("modalDateTime").textContent = dateTime;
+        document.getElementById("imageModal").style.display = "block";
+      }
+
+      function closeModal() {
+        document.getElementById("imageModal").style.display = "none";
+      }
+
+      // Close modal if clicked outside content
+      window.onclick = function (event) {
+        const modal = document.getElementById("imageModal");
+        if (event.target === modal) {
+          modal.style.display = "none";
+        }
+      };
+
+      function filterTable() {
+        // Get input values
+        const location = document
+          .getElementById("location")
+          .value.toLowerCase();
+        const sentTo = document.getElementById("sent_to").value.toLowerCase();
+        const startDate = document.getElementById("sdate").value;
+        const endDate = document.getElementById("edate").value;
+
+        // Convert start and end dates to Date objects
+        const [startDay, startMonth, startYear] = startDate.split("/");
+        const startDateObj = new Date(`${startYear}-${startMonth}-${startDay}`);
+
+        const [endDay, endMonth, endYear] = endDate.split("/");
+        const endDateObj = new Date(`${endYear}-${endMonth}-${endDay}`);
+
+        // Get table rows
+        const table = document.getElementById("myTable");
+        const rows = table
+          .getElementsByTagName("tbody")[0]
+          .getElementsByTagName("tr");
+
+        // Loop through rows and filter
+        for (let i = 0; i < rows.length; i++) {
+          const locationText = rows[i].cells[1].textContent.toLowerCase();
+          const sentToText = rows[i].cells[2].textContent.toLowerCase();
+          const dateText = rows[i].cells[3].textContent.split(" ")[0];
+
+          const [day, month, year] = dateText.split("/");
+          const date1 = new Date(`${year}-${month}-${day}`);
+
+          if (
+            locationText == location &&
+            sentToText == sentTo &&
+            date1.getTime() >= startDateObj.getTime() &&
+            date1.getTime() <= endDateObj.getTime()
+          ) {
+            rows[i].classList.remove("hidden");
+            rows[i].classList.add("highlight");
+          } else {
+            rows[i].classList.add("hidden");
+            rows[i].classList.remove("highlight");
+          }
+        }
+      }
+    </script>
+  </body>
+</html>

@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Register Form</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link
+      href="{{url_for('static',filename='/output.css')}}"
+      rel="stylesheet"
+    />
+  </head>
+  <body
+    class="flex justify-center items-center h-screen px-5"
+    style="background-image: url('static/bg.jpg')"
+  >
+    <div
+      class="bg-white p-8 w-96 rounded-xl shadow-2xl shadow-amber-300 text-center"
+    >
+      <h2 class="text-3xl font-semibold">Register Account</h2>
+      <br />
+      <form action="/register" method="POST" id="registerform">
+        <input
+          class="w-full bg-transparent placeholder:text-slate-400 text-slate-700 text-sm border border-slate-200 rounded-md px-3 py-2 transition duration-300 ease focus:outline-none focus:border-slate-400 hover:border-slate-300 shadow-sm focus:shadow"
+          type="text"
+          id="username"
+          name="username"
+          placeholder="Username"
+          value="{{username}}"
+          required
+        /><br /><br />
+        <input
+          class="w-full bg-transparent placeholder:text-slate-400 text-slate-700 text-sm border border-slate-200 rounded-md px-3 py-2 transition duration-300 ease focus:outline-none focus:border-slate-400 hover:border-slate-300 shadow-sm focus:shadow"
+          type="text"
+          id="email"
+          name="email"
+          placeholder="Email"
+          value="{{email}}"
+          required
+        />
+        <div id="msg" class="text-left"></div>
+        <br />
+        <input
+          class="w-full bg-transparent placeholder:text-slate-400 text-slate-700 text-sm border border-slate-200 rounded-md px-3 py-2 transition duration-300 ease focus:outline-none focus:border-slate-400 hover:border-slate-300 shadow-sm focus:shadow"
+          type="password"
+          id="password"
+          name="password"
+          placeholder="Password"
+          value="{{password}}"
+          required
+        /><br /><br />
+        <a href="{{ url_for('login') }}">
+          <input
+            type="submit"
+            class="w-full text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
+            value="CREATE ACCOUNT"
+        /></a>
+
+        {% with messages = get_flashed_messages(with_categories=True) %} {% if
+          messages %}
+          <div class="my-4">
+            {% for category, message in messages %}
+            <div class="bg-red-100 text-red-700" style="color: red" role="alert">
+              <span class="sm:inline">{{ message }}</span>
+            </div>
+            {% endfor %}
+          </div>
+        {% endif %} {% endwith %}
+
+
+      <br />
+      <h2>
+        Already have an account?
+        <a href="{{ url_for('login') }}" class="text-blue-600">Login</a>
+      </h2>
+    </div>
+    <script type="text/javascript">
+      $(document).ready(function () {
+        $("#email").on("input", function () {
+          $("#msg").hide();
+          const email = $("#email").val();
+
+          if (email == null || email == "") {
+            $("#msg").show();
+            $("#msg").html("Email is required field.").css("color", "red");
+          } else {
+            $.ajax({
+              type: "POST",
+              url: "/email_check",
+              data: { email: email }, // Send only the email field
+              success: function (msg) {
+                $("#msg").show();
+                $("#msg").html(msg);
+              },
+              error: function (jqXHR, textStatus, errorThrown) {
+                $("#msg").show();
+                $("#msg").html(textStatus + " " + errorThrown);
+              },
+            });
+          }
+        });
+      });
+    </script>
+  </body>
+</html>
